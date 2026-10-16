@@ -1,0 +1,110 @@
+{
+  "ai-backend/main.py": {
+    "mtime": 1792152481.0220666,
+    "seen": 1792155547.0092442,
+    "ast_hash": "7e1b0d4908b5bb428fa90206b4387cd1",
+    "semantic_hash": "7e1b0d4908b5bb428fa90206b4387cd1"
+  },
+  "frontend/app/counselor/page.tsx": {
+    "mtime": 1792152478.2690747,
+    "seen": 1792155547.0092497,
+    "ast_hash": "c6cd2bc8b03c69a477ca8c32242effce",
+    "semantic_hash": "c6cd2bc8b03c69a477ca8c32242effce"
+  },
+  "frontend/app/layout.tsx": {
+    "mtime": 1792152476.1373117,
+    "seen": 1792155547.0092525,
+    "ast_hash": "b022719eedbbd3e542833f949f4661af",
+    "semantic_hash": "b022719eedbbd3e542833f949f4661af"
+  },
+  "frontend/app/owner/page.tsx": {
+    "mtime": 1792152477.443523,
+    "seen": 1792155547.0092542,
+    "ast_hash": "b5d81dd8d3c11d213676efcbe75f1bbf",
+    "semantic_hash": "b5d81dd8d3c11d213676efcbe75f1bbf"
+  },
+  "frontend/app/page.tsx": {
+    "mtime": 1792152476.6689005,
+    "seen": 1792155547.009256,
+    "ast_hash": "ed7b08baf87f114d11aceb53e5fe80f2",
+    "semantic_hash": "ed7b08baf87f114d11aceb53e5fe80f2"
+  },
+  "frontend/app/student/page.tsx": {
+    "mtime": 1792152479.9131012,
+    "seen": 1792155547.0092573,
+    "ast_hash": "b7760bfb6f4fc054b038fea1ab66e099",
+    "semantic_hash": "b7760bfb6f4fc054b038fea1ab66e099"
+  },
+  "frontend/app/trainer/page.tsx": {
+    "mtime": 1792152479.0331273,
+    "seen": 1792155547.0092587,
+    "ast_hash": "c99da1594472ce18ec179af92903851a",
+    "semantic_hash": "c99da1594472ce18ec179af92903851a"
+  },
+  "frontend/eslint.config.mjs": {
+    "mtime": 1792152473.9650793,
+    "seen": 1792155547.0092597,
+    "ast_hash": "a28251ba62e169d583f4f218cc6ba5ef",
+    "semantic_hash": "a28251ba62e169d583f4f218cc6ba5ef"
+  },
+  "frontend/next.config.ts": {
+    "mtime": 1792152473.704817,
+    "seen": 1792155547.0092611,
+    "ast_hash": "daad32b4de0b92afe04301ebf0a6cc76",
+    "semantic_hash": "daad32b4de0b92afe04301ebf0a6cc76"
+  },
+  "frontend/package.json": {
+    "mtime": 1792152473.1862276,
+    "seen": 1792155547.0092623,
+    "ast_hash": "80b64b2c5ce0486f4aafc5e1280834b1",
+    "semantic_hash": "80b64b2c5ce0486f4aafc5e1280834b1"
+  },
+  "frontend/prisma.config.ts": {
+    "mtime": 1792152474.2412684,
+    "seen": 1792155547.0092635,
+    "ast_hash": "c9410c8647d08df29454165c64783cf4",
+    "semantic_hash": "c9410c8647d08df29454165c64783cf4"
+  },
+  "frontend/prisma.ts": {
+    "mtime": 1792152474.5057633,
+    "seen": 1792155547.0092652,
+    "ast_hash": "e7ff8faaf670487e55c1dab94649c378",
+    "semantic_hash": "e7ff8faaf670487e55c1dab94649c378"
+  },
+  "frontend/prisma/migrations/20261016121801_init/migration.sql": {
+    "mtime": 1792153081.7969847,
+    "seen": 1792155547.0092664,
+    "ast_hash": "689f8fdd6a993ed9ef73d2e9607ff38c",
+    "semantic_hash": "689f8fdd6a993ed9ef73d2e9607ff38c"
+  },
+  "frontend/tsconfig.json": {
+    "mtime": 1792152473.4583147,
+    "seen": 1792155547.0092678,
+    "ast_hash": "6b0a23f6921ac0cde57ac10e13cb0cb9",
+    "semantic_hash": "6b0a23f6921ac0cde57ac10e13cb0cb9"
+  },
+  "PS1_INSTITUTE_OPERATIONS_COPILOT_PRD.md": {
+    "mtime": 1792146932.8019738,
+    "seen": 1792155547.009269,
+    "ast_hash": "a6e6c352477cc18fc6025207db832f83",
+    "semantic_hash": "a6e6c352477cc18fc6025207db832f83"
+  },
+  "README.md": {
+    "mtime": 1792153176.3851929,
+    "seen": 1792155547.0092702,
+    "ast_hash": "3ef307d714c81a62495a2c62110a75df",
+    "semantic_hash": "3ef307d714c81a62495a2c62110a75df"
+  },
+  "ai-backend/requirements.txt": {
+    "mtime": 1792152480.7633348,
+    "seen": 1792155547.0092716,
+    "ast_hash": "4cd36915bf3d9613d20c9747a3cd17a5",
+    "semantic_hash": "4cd36915bf3d9613d20c9747a3cd17a5"
+  },
+  "compose.yaml": {
+    "mtime": 1792153037.031927,
+    "seen": 1792155547.0092726,
+    "ast_hash": "38eaa51b29f7b6ec1d5c6f250283dd08",
+    "semantic_hash": "38eaa51b29f7b6ec1d5c6f250283dd08"
+  }
+}
