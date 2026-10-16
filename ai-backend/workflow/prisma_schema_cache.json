@@ -1,0 +1,462 @@
+{
+  "format_version": 2,
+  "schema": {
+    "models": {
+      "action_approvals": {
+        "fields": {
+          "approverId": "approver_id",
+          "decidedAt": "decided_at",
+          "decision": "decision",
+          "id": "id",
+          "proposalId": "proposal_id"
+        },
+        "model": "ActionApproval",
+        "types": {
+          "approverId": "String",
+          "decidedAt": "DateTime",
+          "decision": "ApprovalDecision",
+          "id": "String",
+          "proposalId": "String"
+        }
+      },
+      "action_executions": {
+        "fields": {
+          "executedAt": "executed_at",
+          "id": "id",
+          "idempotencyKey": "idempotency_key",
+          "proposalId": "proposal_id",
+          "providerRef": "provider_ref",
+          "status": "status"
+        },
+        "model": "ActionExecution",
+        "types": {
+          "executedAt": "DateTime?",
+          "id": "String",
+          "idempotencyKey": "String",
+          "proposalId": "String",
+          "providerRef": "String?",
+          "status": "ProposalStatus"
+        }
+      },
+      "action_proposals": {
+        "fields": {
+          "actionType": "action_type",
+          "expiresAt": "expires_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "payload": "payload",
+          "payloadHash": "payload_hash",
+          "requestId": "request_id",
+          "revision": "revision",
+          "status": "status"
+        },
+        "model": "ActionProposal",
+        "types": {
+          "actionType": "String",
+          "expiresAt": "DateTime?",
+          "id": "String",
+          "instituteId": "String",
+          "payload": "Json",
+          "payloadHash": "String",
+          "requestId": "String?",
+          "revision": "Int",
+          "status": "ProposalStatus"
+        }
+      },
+      "attendance_events": {
+        "fields": {
+          "eventType": "event_type",
+          "id": "id",
+          "instituteId": "institute_id",
+          "modality": "modality",
+          "occurredAt": "occurred_at",
+          "sessionId": "session_id",
+          "source": "source",
+          "studentId": "student_id"
+        },
+        "model": "AttendanceEvent",
+        "types": {
+          "eventType": "AttendanceEventType",
+          "id": "String",
+          "instituteId": "String",
+          "modality": "AttendanceModality",
+          "occurredAt": "DateTime",
+          "sessionId": "String",
+          "source": "String",
+          "studentId": "String"
+        }
+      },
+      "attendance_summary": {
+        "fields": {
+          "id": "id",
+          "minutesPresent": "minutes_present",
+          "sessionId": "session_id",
+          "status": "status",
+          "studentId": "student_id"
+        },
+        "model": "AttendanceSummary",
+        "types": {
+          "id": "String",
+          "minutesPresent": "Int",
+          "sessionId": "String",
+          "status": "AttendanceStatus",
+          "studentId": "String"
+        }
+      },
+      "audit_events": {
+        "fields": {
+          "actorId": "actor_id",
+          "createdAt": "created_at",
+          "eventHash": "event_hash",
+          "eventType": "event_type",
+          "id": "id",
+          "instituteId": "institute_id",
+          "metadataRedacted": "metadata_redacted",
+          "objectId": "object_id",
+          "objectType": "object_type",
+          "previousHash": "previous_hash"
+        },
+        "model": "AuditEvent",
+        "types": {
+          "actorId": "String?",
+          "createdAt": "DateTime",
+          "eventHash": "String",
+          "eventType": "String",
+          "id": "String",
+          "instituteId": "String",
+          "metadataRedacted": "Json",
+          "objectId": "String",
+          "objectType": "String",
+          "previousHash": "String?"
+        }
+      },
+      "batches": {
+        "fields": {
+          "courseId": "course_id",
+          "endDate": "end_date",
+          "id": "id",
+          "instituteId": "institute_id",
+          "mode": "mode",
+          "name": "name",
+          "onlineSeatLimit": "online_seat_limit",
+          "preferredWindows": "preferred_windows",
+          "startDate": "start_date"
+        },
+        "model": "Batch",
+        "types": {
+          "courseId": "String",
+          "endDate": "DateTime",
+          "id": "String",
+          "instituteId": "String",
+          "mode": "DeliveryMode",
+          "name": "String",
+          "onlineSeatLimit": "Int?",
+          "preferredWindows": "Json",
+          "startDate": "DateTime"
+        }
+      },
+      "copilot_requests": {
+        "fields": {
+          "createdAt": "created_at",
+          "id": "id",
+          "intent": "intent",
+          "policyDecision": "policy_decision",
+          "promptRedacted": "prompt_redacted",
+          "queryHash": "query_hash",
+          "queryPlan": "query_plan",
+          "resultCount": "result_count",
+          "threadId": "thread_id"
+        },
+        "model": "CopilotRequest",
+        "types": {
+          "createdAt": "DateTime",
+          "id": "String",
+          "intent": "String",
+          "policyDecision": "PolicyDecision",
+          "promptRedacted": "String",
+          "queryHash": "String?",
+          "queryPlan": "Json?",
+          "resultCount": "Int?",
+          "threadId": "String"
+        }
+      },
+      "copilot_threads": {
+        "fields": {
+          "createdAt": "created_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "userId": "user_id"
+        },
+        "model": "CopilotThread",
+        "types": {
+          "createdAt": "DateTime",
+          "id": "String",
+          "instituteId": "String",
+          "userId": "String"
+        }
+      },
+      "courses": {
+        "fields": {
+          "durationWeeks": "duration_weeks",
+          "id": "id",
+          "instituteId": "institute_id",
+          "name": "name"
+        },
+        "model": "Course",
+        "types": {
+          "durationWeeks": "Int",
+          "id": "String",
+          "instituteId": "String",
+          "name": "String"
+        }
+      },
+      "enrollments": {
+        "fields": {
+          "batchId": "batch_id",
+          "id": "id",
+          "instituteId": "institute_id",
+          "status": "status",
+          "studentId": "student_id"
+        },
+        "model": "Enrollment",
+        "types": {
+          "batchId": "String",
+          "id": "String",
+          "instituteId": "String",
+          "status": "RecordStatus",
+          "studentId": "String"
+        }
+      },
+      "fee_plans": {
+        "fields": {
+          "currency": "currency",
+          "enrollmentId": "enrollment_id",
+          "id": "id",
+          "instituteId": "institute_id",
+          "totalAmount": "total_amount"
+        },
+        "model": "FeePlan",
+        "types": {
+          "currency": "String",
+          "enrollmentId": "String",
+          "id": "String",
+          "instituteId": "String",
+          "totalAmount": "Decimal"
+        }
+      },
+      "installments": {
+        "fields": {
+          "amount": "amount",
+          "dueAt": "due_at",
+          "feePlanId": "fee_plan_id",
+          "id": "id",
+          "instituteId": "institute_id",
+          "sequenceNo": "sequence_no",
+          "status": "status"
+        },
+        "model": "Installment",
+        "types": {
+          "amount": "Decimal",
+          "dueAt": "DateTime",
+          "feePlanId": "String",
+          "id": "String",
+          "instituteId": "String",
+          "sequenceNo": "Int",
+          "status": "InstallmentStatus"
+        }
+      },
+      "institutes": {
+        "fields": {
+          "id": "id",
+          "name": "name",
+          "timezone": "timezone"
+        },
+        "model": "Institute",
+        "types": {
+          "id": "String",
+          "name": "String",
+          "timezone": "String"
+        }
+      },
+      "payments": {
+        "fields": {
+          "amount": "amount",
+          "id": "id",
+          "installmentId": "installment_id",
+          "instituteId": "institute_id",
+          "paidAt": "paid_at",
+          "reference": "reference",
+          "source": "source",
+          "status": "status"
+        },
+        "model": "Payment",
+        "types": {
+          "amount": "Decimal",
+          "id": "String",
+          "installmentId": "String",
+          "instituteId": "String",
+          "paidAt": "DateTime?",
+          "reference": "String?",
+          "source": "PaymentSource",
+          "status": "PaymentStatus"
+        }
+      },
+      "recordings": {
+        "fields": {
+          "availableAt": "available_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "sessionId": "session_id",
+          "status": "status",
+          "url": "url"
+        },
+        "model": "Recording",
+        "types": {
+          "availableAt": "DateTime?",
+          "id": "String",
+          "instituteId": "String",
+          "sessionId": "String",
+          "status": "RecordingStatus",
+          "url": "String"
+        }
+      },
+      "rooms": {
+        "fields": {
+          "capacity": "capacity",
+          "id": "id",
+          "instituteId": "institute_id",
+          "name": "name"
+        },
+        "model": "Room",
+        "types": {
+          "capacity": "Int",
+          "id": "String",
+          "instituteId": "String",
+          "name": "String"
+        }
+      },
+      "sessions": {
+        "fields": {
+          "batchId": "batch_id",
+          "endsAt": "ends_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "mode": "mode",
+          "roomId": "room_id",
+          "scheduleVersion": "schedule_version",
+          "startsAt": "starts_at",
+          "status": "status",
+          "trainerId": "trainer_id"
+        },
+        "model": "Session",
+        "types": {
+          "batchId": "String",
+          "endsAt": "DateTime",
+          "id": "String",
+          "instituteId": "String",
+          "mode": "DeliveryMode",
+          "roomId": "String?",
+          "scheduleVersion": "Int",
+          "startsAt": "DateTime",
+          "status": "SessionStatus",
+          "trainerId": "String"
+        }
+      },
+      "students": {
+        "fields": {
+          "externalRef": "external_ref",
+          "guardianPhone": "guardian_phone",
+          "id": "id",
+          "instituteId": "institute_id",
+          "name": "name",
+          "phone": "phone",
+          "status": "status",
+          "userId": "user_id"
+        },
+        "model": "Student",
+        "types": {
+          "externalRef": "String?",
+          "guardianPhone": "String?",
+          "id": "String",
+          "instituteId": "String",
+          "name": "String",
+          "phone": "String?",
+          "status": "RecordStatus",
+          "userId": "String?"
+        }
+      },
+      "trainer_availability": {
+        "fields": {
+          "available": "available",
+          "dayOfWeek": "day_of_week",
+          "endTime": "end_time",
+          "id": "id",
+          "startTime": "start_time",
+          "trainerId": "trainer_id"
+        },
+        "model": "TrainerAvailability",
+        "types": {
+          "available": "Boolean",
+          "dayOfWeek": "Int",
+          "endTime": "DateTime",
+          "id": "String",
+          "startTime": "DateTime",
+          "trainerId": "String"
+        }
+      },
+      "trainer_batch_assignments": {
+        "fields": {
+          "batchId": "batch_id",
+          "trainerId": "trainer_id"
+        },
+        "model": "TrainerBatchAssignment",
+        "types": {
+          "batchId": "String",
+          "trainerId": "String"
+        }
+      },
+      "trainers": {
+        "fields": {
+          "id": "id",
+          "instituteId": "institute_id",
+          "userId": "user_id"
+        },
+        "model": "Trainer",
+        "types": {
+          "id": "String",
+          "instituteId": "String",
+          "userId": "String"
+        }
+      },
+      "user_roles": {
+        "fields": {
+          "role": "role",
+          "userId": "user_id"
+        },
+        "model": "UserRole",
+        "types": {
+          "role": "Role",
+          "userId": "String"
+        }
+      },
+      "users": {
+        "fields": {
+          "email": "email",
+          "id": "id",
+          "instituteId": "institute_id",
+          "name": "name",
+          "status": "status"
+        },
+        "model": "User",
+        "types": {
+          "email": "String",
+          "id": "String",
+          "instituteId": "String",
+          "name": "String",
+          "status": "RecordStatus"
+        }
+      }
+    }
+  },
+  "sha256": "40e954479870afb2d7bbcdc4b2c350238ad5e9ee26f1eba47e7c5ad52efeb41d"
+}
