@@ -128,7 +128,7 @@ def route_query(query: str) -> dict[str, Any]:
         raise ValueError("Query is too long (maximum 8,000 characters for this stage).")
 
     api_key = os.getenv("JEV_API_KEY", "").strip()
-    api_url = os.getenv("JEV_API_URL", DEFAULT_JEV_URL).strip()
+    api_url = (os.getenv("JEV_API_URL") or DEFAULT_JEV_URL).strip()
     model = os.getenv("JEV_MODEL", "jev-1.13").strip()
     if not api_key:
         raise JevError("JEV_API_KEY is missing from ai-backend/.env.")
