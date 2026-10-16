@@ -1,0 +1,21 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# JavaScript / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/generated/
+frontend/next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+ai-backend/.venv/
+ai-backend/venv/
+
+# Local tools
+.DS_Store
+Thumbs.db

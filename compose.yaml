@@ -1,0 +1,21 @@
+services:
+  localhostdb:
+    image: postgres:17-alpine
+    container_name: localhostdb
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: opspilot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: opspilot_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - localhostdb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d opspilot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  localhostdb_data:
