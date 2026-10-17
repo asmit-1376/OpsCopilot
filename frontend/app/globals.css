@@ -779,6 +779,34 @@ a {
 }
 
 /* Main CTA Button: Golden Amber */
+.tst-google-btn {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 4px 0 8px;
+  border: 1px solid #dadce0;
+  border-radius: 10px;
+  color: #3c4043;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease, box-shadow .2s ease;
+}
+
+.tst-google-btn:hover:not(:disabled) {
+  background: #f8faff;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, .25);
+}
+
+.tst-google-btn:disabled {
+  opacity: .65;
+  cursor: not-allowed;
+}
+
 .tst-btn-amber-lg {
   width: 100%;
   height: 50px;
@@ -1948,6 +1976,41 @@ a {
   color: #ffffff;
   font-weight: 800;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+/* Shared Codebase Intel visual language for public, auth, and utility routes. */
+.tst-page {
+  color: #111827;
+  background-color: #faf8f4;
+  background-image: linear-gradient(to right, rgba(17, 24, 39, .035) 1px, transparent 1px), linear-gradient(to bottom, rgba(17, 24, 39, .035) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+.tst-nav { background: rgba(250, 248, 244, .96); border-bottom: 2px solid #111827; box-shadow: 3px 3px 0 #111827; }
+.tst-logo-badge, .tst-btn-amber-sm { border: 2px solid #111827; border-radius: 3px; box-shadow: 3px 3px 0 #111827; }
+.tst-btn-amber-sm { background: #fa7417; color: #fff; }
+.tst-btn-amber-sm:hover { background: #e45c09; }
+.tst-pill-badge { border: 2px solid #111827; border-radius: 3px; background: #fffefa; box-shadow: 3px 3px 0 #111827; }
+.tst-text-gradient-amber { color: #c6530a; background: none; -webkit-text-fill-color: currentColor; }
+.tst-btn-amber-lg { border: 2px solid #111827; border-radius: 3px; color: #fff; background: #fa7417; box-shadow: 4px 4px 0 #111827; }
+.tst-btn-amber-lg:hover { background: #e45c09; box-shadow: 2px 2px 0 #111827; transform: translate(2px, 2px); }
+.tst-google-btn { border: 2px solid #111827; border-radius: 3px; box-shadow: 3px 3px 0 #111827; }
+.tst-auth-card { border: 2px solid #111827; border-radius: 4px; background: #fffefa; box-shadow: 7px 7px 0 #111827; }
+.tst-tab-switch { border: 2px solid #111827; border-radius: 3px; background: #f1eee7; }
+.tst-tab-btn { border-radius: 2px; }
+.tst-tab-btn.active { color: #fff; background: #111827; box-shadow: 2px 2px 0 #fa7417; }
+.tst-card-title { letter-spacing: -.04em; }
+.tst-label { color: #263244; }
+.tst-input { border: 2px solid #111827; border-radius: 3px; }
+.tst-input:focus { border-color: #111827; box-shadow: 0 0 0 3px #ffb27c; }
+.tst-footer { border-top: 2px solid #111827; background: #f7f3ec; }
+.role-card { border: 2px solid #111827 !important; border-radius: 4px !important; background: #fffefa !important; box-shadow: 5px 5px 0 #111827 !important; }
+.role-card:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 #111827 !important; }
+.role-card h3 { letter-spacing: -.03em; }
+.tst-btn-whatsapp { border: 2px solid #111827; border-radius: 3px; box-shadow: 3px 3px 0 #111827; }
+.tst-page a:focus-visible, .tst-page button:focus-visible, .tst-page input:focus-visible, .tst-page select:focus-visible { outline: 3px solid #ffb27c; outline-offset: 2px; }
+@media (max-width: 640px) {
+  .tst-auth-card { padding: 22px 18px; box-shadow: 5px 5px 0 #111827; }
+  .tst-nav { box-shadow: 2px 2px 0 #111827; }
 }
 
 
