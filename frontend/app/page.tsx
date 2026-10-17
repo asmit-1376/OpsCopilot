@@ -19,7 +19,7 @@ export default function HomePage() {
                 <path d="M12 6L4.5 19h15L12 6zm-1.2 5.5l2.4 4.1h-4.8l2.4-4.1z" />
               </svg>
             </div>
-            <span className="tst-brand-title">TechSummitTrainers</span>
+            <span className="tst-brand-title">OpsCopilot</span>
           </Link>
 
           <div className="tst-nav-actions">
@@ -44,7 +44,7 @@ export default function HomePage() {
         </h1>
 
         <p style={{ fontSize: "18px", color: "#4B5563", maxWidth: "680px", lineHeight: 1.6, marginBottom: "32px" }}>
-          Unified governance, admissions CRM, faculty scheduling, and student learning paths for TechSummitTrainers.
+          Unified governance, admissions CRM, faculty scheduling, and student learning paths for your institute.
         </p>
 
         {/* Action Link to Authentication */}
@@ -52,15 +52,6 @@ export default function HomePage() {
           <Link href="/login" className="tst-btn-amber-lg" style={{ width: "auto", padding: "0 28px" }}>
             Open Authentication Page →
           </Link>
-          <a
-            href="https://wa.me/918485846806"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="tst-btn-whatsapp"
-            style={{ width: "auto", padding: "0 22px" }}
-          >
-            WhatsApp Support (+91 84858 46806)
-          </a>
         </div>
 
         {/* Role Cards Grid */}
@@ -101,7 +92,7 @@ export default function HomePage() {
       <footer className="tst-footer">
         <div className="tst-container">
           <div className="tst-footer-flex">
-            <div>© {new Date().getFullYear()} TechSummitTrainers OpsPilot</div>
+            <div>© {new Date().getFullYear()} OpsCopilot</div>
             <div className="tst-footer-links">
               <Link href="/login">Sign In</Link>
               <Link href="/auth">Register</Link>

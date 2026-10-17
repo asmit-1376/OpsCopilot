@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TechSummitTrainers | Portal & Institute Operations",
-  description: "Not a coaching class. A career launchpad. TechSummitTrainers authentication portal and institute copilot.",
+  title: "OpsCopilot | Institute Operations",
+  description: "OpsCopilot institute operations and learning platform.",
   icons: {
     icon: "/favicon.ico",
   },
