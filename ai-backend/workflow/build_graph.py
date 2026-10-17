@@ -2,15 +2,58 @@
 
 from __future__ import annotations
 
+import json
+import re
 from typing import AsyncIterator, Literal
 
 from langgraph.graph import END, START, StateGraph
 
-from workflow.decision import route_query
+from workflow.decision import JevError, route_query
 from workflow.generate import astream_final_response
 from workflow.state import WorkflowState
-from workflow.workers.sqlquery import execute_query_plan, generate_query
-from workflow.workers.whatsappagent import mobile_from_database, run_whatsapp_agent
+from workflow.workers.sqlquery import SQLAgentError, execute_query_plan, generate_query
+from workflow.workers.whatsappagent import prepare_whatsapp_proposal
+
+
+_PRIVATE_LOG_KEYS = {
+    "email",
+    "phone",
+    "guardian_phone",
+    "mobile",
+    "mobile_number",
+    "recipient_address",
+    "parameters",
+    "password",
+    "secret",
+    "api_key",
+    "access_token",
+    "refresh_token",
+    "id_token",
+}
+_EMAIL_PATTERN = re.compile(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b")
+_INDIAN_PHONE_PATTERN = re.compile(r"(?<!\w)(?:\+?91[\s-]?)?[6-9]\d{9}(?!\w)")
+_MAX_NODE_LOG_CHARS = 4000
+
+
+def _safe_terminal_value(value):
+    if isinstance(value, dict):
+        return {
+            key: "[redacted]" if key.casefold() in _PRIVATE_LOG_KEYS else _safe_terminal_value(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_safe_terminal_value(item) for item in value]
+    if isinstance(value, str):
+        value = _EMAIL_PATTERN.sub("[email redacted]", value)
+        return _INDIAN_PHONE_PATTERN.sub("[phone redacted]", value)
+    return value
+
+
+def _log_node_output(node_name: str, output: dict) -> None:
+    rendered = json.dumps(_safe_terminal_value(output), ensure_ascii=False, default=str)
+    if len(rendered) > _MAX_NODE_LOG_CHARS:
+        rendered = rendered[:_MAX_NODE_LOG_CHARS] + "… [truncated]"
+    print(f"[LangGraph] NODE OUTPUT {node_name}: {rendered}", flush=True)
 
 
 def _events(state: WorkflowState, message: str) -> list[str]:
@@ -23,7 +66,16 @@ def _errors(state: WorkflowState, message: str) -> list[str]:
 
 def router_node(state: WorkflowState) -> dict:
     try:
-        route = route_query(state["query"])
+        route = route_query(
+            state["query"],
+            role=state.get("role", "owner"),
+            history=state.get("history", []),
+        )
+    except JevError as exc:
+        return {
+            "route": {"status": "failed", "workers": []},
+            "errors": _errors(state, str(exc)),
+        }
     except Exception as exc:
         return {
             "route": {"status": "failed", "workers": []},
@@ -32,7 +84,7 @@ def router_node(state: WorkflowState) -> dict:
     if route.get("status") != "routed":
         return {
             "route": route,
-            "errors": _errors(state, "The request needs clarification before workers can run."),
+            "errors": _errors(state, route.get("message") or "The request needs clarification before workers can run."),
         }
     return {"route": route}
 
@@ -54,7 +106,20 @@ def sql_agent_node(state: WorkflowState) -> dict:
             institute_id=state.get("institute_id", ""),
             trainer_id=state.get("trainer_id"),
             student_id=state.get("student_id"),
+            conversation_context="\n".join(
+                f"{item.get('role', 'USER')}: {item.get('content', '')}"
+                for item in state.get("history", [])[-12:]
+            ),
+            require_student_recipient="whatsapp_agent" in state.get("route", {}).get("workers", []),
         )
+    except SQLAgentError as exc:
+        reason = str(_safe_terminal_value(str(exc)))
+        print(f"[LangGraph] SQL planning failed: {reason}", flush=True)
+        return {
+            "database_status": "failed",
+            "errors": _errors(state, f"SQL planning failed: {reason}"),
+            "worker_events": _events(state, "Database query could not be prepared."),
+        }
     except Exception as exc:
         return {
             "database_status": "failed",
@@ -66,8 +131,9 @@ def sql_agent_node(state: WorkflowState) -> dict:
         return {
             "sql_plan": plan,
             "database_status": "failed",
+            "route": {**state.get("route", {}), "status": plan.get("decision", "failed")},
             "errors": _errors(state, reason),
-            "worker_events": _events(state, "Database retrieval failed."),
+            "worker_events": _events(state, "Database retrieval needs clarification." if plan.get("decision") == "clarify" else "Database retrieval failed."),
         }
     return {"sql_plan": plan}
 
@@ -89,7 +155,6 @@ def database_node(state: WorkflowState) -> dict:
     return {
         "database_rows": rows,
         "database_status": "success",
-        "retrieved_mobile": mobile_from_database(rows),
         "worker_events": _events(state, f"Successfully retrieved {len(rows)} record(s)."),
     }
 
@@ -102,17 +167,17 @@ def after_database(state: WorkflowState) -> Literal["whatsapp_agent", "prepare_r
 
 
 def whatsapp_agent_node(state: WorkflowState) -> dict:
-    result = run_whatsapp_agent(
+    result = prepare_whatsapp_proposal(
         state["query"],
         state.get("database_rows", []),
-        state.get("retrieved_mobile") or state.get("mobile_number"),
     )
-    if result.get("status") == "success":
+    if result.get("status") == "pending_approval":
         return {
             "whatsapp_message": result.get("message"),
+            "whatsapp_proposal": result,
             "whatsapp_result": result,
-            "whatsapp_status": "success",
-            "worker_events": _events(state, "Successfully sent WhatsApp message."),
+            "whatsapp_status": "pending_approval",
+            "worker_events": _events(state, "WhatsApp draft ready for your approval."),
         }
     reason = result.get("reason", "unknown_error")
     return {
@@ -126,8 +191,8 @@ def whatsapp_agent_node(state: WorkflowState) -> dict:
 def prepare_response_node(state: WorkflowState) -> dict:
     if state.get("errors"):
         status = state["errors"][-1]
-    elif state.get("whatsapp_status") == "success":
-        status = "Successfully sent WhatsApp message."
+    elif state.get("whatsapp_status") == "pending_approval":
+        status = "WhatsApp draft is ready. Review and approve it to send."
     elif state.get("database_status") == "success":
         status = f"Successfully retrieved {len(state.get('database_rows', []))} record(s)."
     else:
@@ -163,6 +228,7 @@ def initial_state(query: str, **context) -> WorkflowState:
         "trainer_id": context.get("trainer_id"),
         "student_id": context.get("student_id"),
         "mobile_number": context.get("mobile_number"),
+        "history": context.get("history", []),
         "database_rows": [],
         "worker_events": [],
         "errors": [],
@@ -173,16 +239,50 @@ def run_workflow(query: str, **context) -> WorkflowState:
     return workflow.invoke(initial_state(query, **context))
 
 
-async def astream_workflow(query: str, **context) -> AsyncIterator[str]:
-    """Emit immediate worker statuses, then stream the generated final answer."""
+async def astream_workflow(query: str, **context) -> AsyncIterator[dict]:
+    """Emit typed events for worker progress, proposals, and final answer tokens."""
     state = initial_state(query, **context)
     emitted = 0
+    proposal_emitted = False
+    yield {"event": "status", "data": {"worker": "router", "message": "Understanding your request…"}}
     async for update in workflow.astream(state, stream_mode="updates"):
-        for values in update.values():
+        for node_name, values in update.items():
+            _log_node_output(node_name, values)
             state.update(values)
         events = state.get("worker_events", [])
         for event in events[emitted:]:
             emitted += 1
-            yield event + "\n"
+            yield {"event": "status", "data": {"worker": "workflow", "message": event}}
+        proposal = state.get("whatsapp_proposal")
+        if proposal and not proposal_emitted:
+            proposal_emitted = True
+            if proposal.get("status") == "pending_approval":
+                yield {
+                    "event": "proposal",
+                    "data": {
+                        "type": "WHATSAPP_SEND",
+                        "recipient_student_id": proposal["recipient_student_id"],
+                        "message": proposal["message"],
+                    },
+                }
+    final_chunks = []
     async for chunk in astream_final_response(state):
-        yield chunk
+        if chunk:
+            final_chunks.append(chunk)
+            yield {"event": "token", "data": {"text": chunk}}
+    _log_node_output("final_response", {"text": "".join(final_chunks)})
+    yield {
+        "event": "done",
+        "data": {
+            "intent": state.get("route", {}).get("intent", "other"),
+            "workers": state.get("route", {}).get("workers", []),
+            "database_status": state.get("database_status"),
+            "result_count": len(state.get("database_rows", [])),
+            "whatsapp_status": state.get("whatsapp_status"),
+            "policy_decision": "REQUIRE_APPROVAL" if state.get("whatsapp_status") == "pending_approval" else ("ALLOW" if not state.get("errors") else "PARTIAL"),
+            "query_plan": {
+                "workers": state.get("route", {}).get("workers", []),
+                "execution_mode": state.get("route", {}).get("execution_mode", "none"),
+            },
+        },
+    }

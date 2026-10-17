@@ -63,6 +63,45 @@
           "status": "ProposalStatus"
         }
       },
+      "admission_leads": {
+        "fields": {
+          "assignedCounselorId": "assigned_counselor_id",
+          "convertedStudentId": "converted_student_id",
+          "createdAt": "created_at",
+          "createdById": "created_by_id",
+          "email": "email",
+          "guardianName": "guardian_name",
+          "guardianPhone": "guardian_phone",
+          "id": "id",
+          "instituteId": "institute_id",
+          "name": "name",
+          "notes": "notes",
+          "phone": "phone",
+          "source": "source",
+          "stage": "stage",
+          "targetTrack": "target_track",
+          "updatedAt": "updated_at"
+        },
+        "model": "AdmissionLead",
+        "types": {
+          "assignedCounselorId": "String?",
+          "convertedStudentId": "String?",
+          "createdAt": "DateTime",
+          "createdById": "String?",
+          "email": "String?",
+          "guardianName": "String?",
+          "guardianPhone": "String?",
+          "id": "String",
+          "instituteId": "String",
+          "name": "String",
+          "notes": "String?",
+          "phone": "String?",
+          "source": "String",
+          "stage": "LeadStage",
+          "targetTrack": "String",
+          "updatedAt": "DateTime"
+        }
+      },
       "attendance_events": {
         "fields": {
           "eventType": "event_type",
@@ -130,6 +169,135 @@
           "previousHash": "String?"
         }
       },
+      "auth_accounts": {
+        "fields": {
+          "accessToken": "access_token",
+          "accessTokenExpiresAt": "access_token_expires_at",
+          "accountId": "account_id",
+          "createdAt": "created_at",
+          "id": "id",
+          "idToken": "id_token",
+          "password": "password",
+          "providerId": "provider_id",
+          "refreshToken": "refresh_token",
+          "refreshTokenExpiresAt": "refresh_token_expires_at",
+          "scope": "scope",
+          "updatedAt": "updated_at",
+          "userId": "user_id"
+        },
+        "model": "Account",
+        "types": {
+          "accessToken": "String?",
+          "accessTokenExpiresAt": "DateTime?",
+          "accountId": "String",
+          "createdAt": "DateTime",
+          "id": "String",
+          "idToken": "String?",
+          "password": "String?",
+          "providerId": "String",
+          "refreshToken": "String?",
+          "refreshTokenExpiresAt": "DateTime?",
+          "scope": "String?",
+          "updatedAt": "DateTime",
+          "userId": "String"
+        }
+      },
+      "auth_sessions": {
+        "fields": {
+          "createdAt": "created_at",
+          "expiresAt": "expires_at",
+          "id": "id",
+          "ipAddress": "ip_address",
+          "token": "token",
+          "updatedAt": "updated_at",
+          "userAgent": "user_agent",
+          "userId": "user_id"
+        },
+        "model": "AuthSession",
+        "types": {
+          "createdAt": "DateTime",
+          "expiresAt": "DateTime",
+          "id": "String",
+          "ipAddress": "String?",
+          "token": "String",
+          "updatedAt": "DateTime",
+          "userAgent": "String?",
+          "userId": "String"
+        }
+      },
+      "auth_verifications": {
+        "fields": {
+          "createdAt": "created_at",
+          "expiresAt": "expires_at",
+          "id": "id",
+          "identifier": "identifier",
+          "updatedAt": "updated_at",
+          "value": "value"
+        },
+        "model": "Verification",
+        "types": {
+          "createdAt": "DateTime",
+          "expiresAt": "DateTime",
+          "id": "String",
+          "identifier": "String",
+          "updatedAt": "DateTime",
+          "value": "String"
+        }
+      },
+      "bank_transactions": {
+        "fields": {
+          "amount": "amount",
+          "createdAt": "created_at",
+          "id": "id",
+          "importedById": "imported_by_id",
+          "instituteId": "institute_id",
+          "occurredAt": "occurred_at",
+          "paymentId": "payment_id",
+          "reference": "reference",
+          "senderName": "sender_name",
+          "source": "source",
+          "status": "status"
+        },
+        "model": "BankTransaction",
+        "types": {
+          "amount": "Decimal",
+          "createdAt": "DateTime",
+          "id": "String",
+          "importedById": "String?",
+          "instituteId": "String",
+          "occurredAt": "DateTime",
+          "paymentId": "String?",
+          "reference": "String",
+          "senderName": "String?",
+          "source": "PaymentSource",
+          "status": "BankTransactionStatus"
+        }
+      },
+      "batch_subject_plans": {
+        "fields": {
+          "batchId": "batch_id",
+          "completedMinutes": "completed_minutes",
+          "deadline": "deadline",
+          "id": "id",
+          "instituteId": "institute_id",
+          "maximumSessionsPerWeek": "maximum_sessions_per_week",
+          "minimumSessionsPerWeek": "minimum_sessions_per_week",
+          "requiredMinutes": "required_minutes",
+          "subjectId": "subject_id"
+        },
+        "model": "BatchSubjectPlan",
+        "types": {
+          "batchId": "String",
+          "completedMinutes": "Int",
+          "deadline": "DateTime",
+          "id": "String",
+          "instituteId": "String",
+          "maximumSessionsPerWeek": "Int",
+          "minimumSessionsPerWeek": "Int",
+          "requiredMinutes": "Int",
+          "subjectId": "String"
+        }
+      },
       "batches": {
         "fields": {
           "courseId": "course_id",
@@ -140,7 +308,10 @@
           "name": "name",
           "onlineSeatLimit": "online_seat_limit",
           "preferredWindows": "preferred_windows",
-          "startDate": "start_date"
+          "sessionDurationMinutes": "session_duration_minutes",
+          "sessionsPerWeek": "sessions_per_week",
+          "startDate": "start_date",
+          "status": "status"
         },
         "model": "Batch",
         "types": {
@@ -152,11 +323,75 @@
           "name": "String",
           "onlineSeatLimit": "Int?",
           "preferredWindows": "Json",
-          "startDate": "DateTime"
+          "sessionDurationMinutes": "Int",
+          "sessionsPerWeek": "Int",
+          "startDate": "DateTime",
+          "status": "RecordStatus"
+        }
+      },
+      "communications": {
+        "fields": {
+          "channel": "channel",
+          "createdAt": "created_at",
+          "createdById": "created_by_id",
+          "id": "id",
+          "instituteId": "institute_id",
+          "message": "message",
+          "providerRef": "provider_ref",
+          "queuedAt": "queued_at",
+          "recipientAddress": "recipient_address",
+          "recipientName": "recipient_name",
+          "sentAt": "sent_at",
+          "status": "status",
+          "studentId": "student_id",
+          "template": "template",
+          "updatedAt": "updated_at"
+        },
+        "model": "Communication",
+        "types": {
+          "channel": "CommunicationChannel",
+          "createdAt": "DateTime",
+          "createdById": "String?",
+          "id": "String",
+          "instituteId": "String",
+          "message": "String",
+          "providerRef": "String?",
+          "queuedAt": "DateTime?",
+          "recipientAddress": "String",
+          "recipientName": "String",
+          "sentAt": "DateTime?",
+          "status": "CommunicationStatus",
+          "studentId": "String?",
+          "template": "String?",
+          "updatedAt": "DateTime"
+        }
+      },
+      "copilot_messages": {
+        "fields": {
+          "content": "content",
+          "createdAt": "created_at",
+          "id": "id",
+          "requestId": "request_id",
+          "role": "role",
+          "sequence": "sequence",
+          "status": "status",
+          "threadId": "thread_id"
+        },
+        "model": "CopilotMessage",
+        "types": {
+          "content": "String",
+          "createdAt": "DateTime",
+          "id": "String",
+          "requestId": "String?",
+          "role": "CopilotMessageRole",
+          "sequence": "Int",
+          "status": "CopilotMessageStatus",
+          "threadId": "String"
         }
       },
       "copilot_requests": {
         "fields": {
+          "clientRequestId": "client_request_id",
           "createdAt": "created_at",
           "id": "id",
           "intent": "intent",
@@ -169,6 +404,7 @@
         },
         "model": "CopilotRequest",
         "types": {
+          "clientRequestId": "String?",
           "createdAt": "DateTime",
           "id": "String",
           "intent": "String",
@@ -182,17 +418,56 @@
       },
       "copilot_threads": {
         "fields": {
+          "activeRequestId": "active_request_id",
+          "archivedAt": "archived_at",
           "createdAt": "created_at",
           "id": "id",
           "instituteId": "institute_id",
+          "title": "title",
+          "updatedAt": "updated_at",
           "userId": "user_id"
         },
         "model": "CopilotThread",
         "types": {
+          "activeRequestId": "String?",
+          "archivedAt": "DateTime?",
           "createdAt": "DateTime",
           "id": "String",
           "instituteId": "String",
+          "title": "String",
+          "updatedAt": "DateTime",
           "userId": "String"
+        }
+      },
+      "counselor_tasks": {
+        "fields": {
+          "assignedToId": "assigned_to_id",
+          "completedAt": "completed_at",
+          "createdAt": "created_at",
+          "createdById": "created_by_id",
+          "dueAt": "due_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "leadId": "lead_id",
+          "priority": "priority",
+          "studentId": "student_id",
+          "title": "title",
+          "updatedAt": "updated_at"
+        },
+        "model": "CounselorTask",
+        "types": {
+          "assignedToId": "String?",
+          "completedAt": "DateTime?",
+          "createdAt": "DateTime",
+          "createdById": "String?",
+          "dueAt": "DateTime?",
+          "id": "String",
+          "instituteId": "String",
+          "leadId": "String?",
+          "priority": "TaskPriority",
+          "studentId": "String?",
+          "title": "String",
+          "updatedAt": "DateTime"
         }
       },
       "courses": {
@@ -200,14 +475,16 @@
           "durationWeeks": "duration_weeks",
           "id": "id",
           "instituteId": "institute_id",
-          "name": "name"
+          "name": "name",
+          "status": "status"
         },
         "model": "Course",
         "types": {
           "durationWeeks": "Int",
           "id": "String",
           "instituteId": "String",
-          "name": "String"
+          "name": "String",
+          "status": "RecordStatus"
         }
       },
       "enrollments": {
@@ -265,6 +542,25 @@
           "status": "InstallmentStatus"
         }
       },
+      "institute_portal_ids": {
+        "fields": {
+          "active": "active",
+          "code": "code",
+          "createdAt": "created_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "role": "role"
+        },
+        "model": "InstitutePortalId",
+        "types": {
+          "active": "Boolean",
+          "code": "String",
+          "createdAt": "DateTime",
+          "id": "String",
+          "instituteId": "String",
+          "role": "Role"
+        }
+      },
       "institutes": {
         "fields": {
           "id": "id",
@@ -276,6 +572,31 @@
           "id": "String",
           "name": "String",
           "timezone": "String"
+        }
+      },
+      "payment_reminders": {
+        "fields": {
+          "channel": "channel",
+          "createdById": "created_by_id",
+          "id": "id",
+          "installmentId": "installment_id",
+          "instituteId": "institute_id",
+          "providerRef": "provider_ref",
+          "queuedAt": "queued_at",
+          "sentAt": "sent_at",
+          "status": "status"
+        },
+        "model": "PaymentReminder",
+        "types": {
+          "channel": "CommunicationChannel",
+          "createdById": "String?",
+          "id": "String",
+          "installmentId": "String",
+          "instituteId": "String",
+          "providerRef": "String?",
+          "queuedAt": "DateTime",
+          "sentAt": "DateTime?",
+          "status": "CommunicationStatus"
         }
       },
       "payments": {
@@ -301,6 +622,29 @@
           "status": "PaymentStatus"
         }
       },
+      "realtime_events": {
+        "fields": {
+          "actorId": "actor_id",
+          "createdAt": "created_at",
+          "eventType": "event_type",
+          "id": "id",
+          "instituteId": "institute_id",
+          "objectId": "object_id",
+          "objectType": "object_type",
+          "payload": "payload"
+        },
+        "model": "RealtimeEvent",
+        "types": {
+          "actorId": "String?",
+          "createdAt": "DateTime",
+          "eventType": "String",
+          "id": "BigInt",
+          "instituteId": "String",
+          "objectId": "String",
+          "objectType": "String",
+          "payload": "Json"
+        }
+      },
       "recordings": {
         "fields": {
           "availableAt": "available_at",
@@ -320,6 +664,31 @@
           "url": "String"
         }
       },
+      "registration_invites": {
+        "fields": {
+          "acceptedAt": "accepted_at",
+          "createdAt": "created_at",
+          "email": "email",
+          "expiresAt": "expires_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "name": "name",
+          "role": "role",
+          "status": "status"
+        },
+        "model": "RegistrationInvite",
+        "types": {
+          "acceptedAt": "DateTime?",
+          "createdAt": "DateTime",
+          "email": "String",
+          "expiresAt": "DateTime?",
+          "id": "String",
+          "instituteId": "String",
+          "name": "String?",
+          "role": "Role",
+          "status": "RegistrationInviteStatus"
+        }
+      },
       "rooms": {
         "fields": {
           "capacity": "capacity",
@@ -335,17 +704,77 @@
           "name": "String"
         }
       },
+      "schedule_plan_changes": {
+        "fields": {
+          "after": "after",
+          "before": "before",
+          "changeType": "change_type",
+          "id": "id",
+          "planId": "plan_id",
+          "reason": "reason",
+          "sessionId": "session_id"
+        },
+        "model": "SchedulePlanChange",
+        "types": {
+          "after": "Json",
+          "before": "Json",
+          "changeType": "String",
+          "id": "String",
+          "planId": "String",
+          "reason": "String",
+          "sessionId": "String?"
+        }
+      },
+      "schedule_plans": {
+        "fields": {
+          "createdAt": "created_at",
+          "id": "id",
+          "inputHash": "input_hash",
+          "inputSnapshot": "input_snapshot",
+          "instituteId": "institute_id",
+          "publishedAt": "published_at",
+          "publishedById": "published_by_id",
+          "query": "query",
+          "requestPayload": "request_payload",
+          "requestedById": "requested_by_id",
+          "retryOfId": "retry_of_id",
+          "solverResult": "solver_result",
+          "status": "status",
+          "updatedAt": "updated_at",
+          "validationResult": "validation_result"
+        },
+        "model": "SchedulePlan",
+        "types": {
+          "createdAt": "DateTime",
+          "id": "String",
+          "inputHash": "String",
+          "inputSnapshot": "Json",
+          "instituteId": "String",
+          "publishedAt": "DateTime?",
+          "publishedById": "String?",
+          "query": "String",
+          "requestPayload": "Json",
+          "requestedById": "String",
+          "retryOfId": "String?",
+          "solverResult": "Json",
+          "status": "SchedulePlanStatus",
+          "updatedAt": "DateTime",
+          "validationResult": "Json"
+        }
+      },
       "sessions": {
         "fields": {
           "batchId": "batch_id",
           "endsAt": "ends_at",
           "id": "id",
           "instituteId": "institute_id",
+          "isLocked": "is_locked",
           "mode": "mode",
           "roomId": "room_id",
           "scheduleVersion": "schedule_version",
           "startsAt": "starts_at",
           "status": "status",
+          "subjectId": "subject_id",
           "trainerId": "trainer_id"
         },
         "model": "Session",
@@ -354,16 +783,67 @@
           "endsAt": "DateTime",
           "id": "String",
           "instituteId": "String",
+          "isLocked": "Boolean",
           "mode": "DeliveryMode",
           "roomId": "String?",
           "scheduleVersion": "Int",
           "startsAt": "DateTime",
           "status": "SessionStatus",
+          "subjectId": "String?",
           "trainerId": "String"
+        }
+      },
+      "student_escalations": {
+        "fields": {
+          "assignedToId": "assigned_to_id",
+          "createdAt": "created_at",
+          "createdById": "created_by_id",
+          "details": "details",
+          "id": "id",
+          "instituteId": "institute_id",
+          "reason": "reason",
+          "resolvedAt": "resolved_at",
+          "status": "status",
+          "studentId": "student_id"
+        },
+        "model": "StudentEscalation",
+        "types": {
+          "assignedToId": "String?",
+          "createdAt": "DateTime",
+          "createdById": "String?",
+          "details": "String?",
+          "id": "String",
+          "instituteId": "String",
+          "reason": "String",
+          "resolvedAt": "DateTime?",
+          "status": "EscalationStatus",
+          "studentId": "String"
+        }
+      },
+      "student_notes": {
+        "fields": {
+          "authorId": "author_id",
+          "body": "body",
+          "createdAt": "created_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "noteType": "note_type",
+          "studentId": "student_id"
+        },
+        "model": "StudentNote",
+        "types": {
+          "authorId": "String?",
+          "body": "String",
+          "createdAt": "DateTime",
+          "id": "String",
+          "instituteId": "String",
+          "noteType": "NoteType",
+          "studentId": "String"
         }
       },
       "students": {
         "fields": {
+          "email": "email",
           "externalRef": "external_ref",
           "guardianPhone": "guardian_phone",
           "id": "id",
@@ -375,6 +855,7 @@
         },
         "model": "Student",
         "types": {
+          "email": "String?",
           "externalRef": "String?",
           "guardianPhone": "String?",
           "id": "String",
@@ -383,6 +864,23 @@
           "phone": "String?",
           "status": "RecordStatus",
           "userId": "String?"
+        }
+      },
+      "subjects": {
+        "fields": {
+          "courseId": "course_id",
+          "id": "id",
+          "instituteId": "institute_id",
+          "name": "name",
+          "status": "status"
+        },
+        "model": "Subject",
+        "types": {
+          "courseId": "String",
+          "id": "String",
+          "instituteId": "String",
+          "name": "String",
+          "status": "RecordStatus"
         }
       },
       "trainer_availability": {
@@ -404,6 +902,27 @@
           "trainerId": "String"
         }
       },
+      "trainer_availability_exceptions": {
+        "fields": {
+          "active": "active",
+          "endsAt": "ends_at",
+          "id": "id",
+          "instituteId": "institute_id",
+          "reason": "reason",
+          "startsAt": "starts_at",
+          "trainerId": "trainer_id"
+        },
+        "model": "TrainerAvailabilityException",
+        "types": {
+          "active": "Boolean",
+          "endsAt": "DateTime",
+          "id": "String",
+          "instituteId": "String",
+          "reason": "String?",
+          "startsAt": "DateTime",
+          "trainerId": "String"
+        }
+      },
       "trainer_batch_assignments": {
         "fields": {
           "batchId": "batch_id",
@@ -412,6 +931,21 @@
         "model": "TrainerBatchAssignment",
         "types": {
           "batchId": "String",
+          "trainerId": "String"
+        }
+      },
+      "trainer_subject_eligibility": {
+        "fields": {
+          "active": "active",
+          "proficiencyLevel": "proficiency_level",
+          "subjectId": "subject_id",
+          "trainerId": "trainer_id"
+        },
+        "model": "TrainerSubjectEligibility",
+        "types": {
+          "active": "Boolean",
+          "proficiencyLevel": "Int",
+          "subjectId": "String",
           "trainerId": "String"
         }
       },
@@ -441,22 +975,34 @@
       },
       "users": {
         "fields": {
+          "createdAt": "created_at",
           "email": "email",
+          "emailVerified": "email_verified",
+          "hasLoggedIn": "has_logged_in",
           "id": "id",
+          "image": "image",
           "instituteId": "institute_id",
           "name": "name",
-          "status": "status"
+          "requestedRole": "requested_role",
+          "status": "status",
+          "updatedAt": "updated_at"
         },
         "model": "User",
         "types": {
+          "createdAt": "DateTime",
           "email": "String",
+          "emailVerified": "Boolean",
+          "hasLoggedIn": "Boolean",
           "id": "String",
+          "image": "String?",
           "instituteId": "String",
           "name": "String",
-          "status": "RecordStatus"
+          "requestedRole": "Role?",
+          "status": "RecordStatus",
+          "updatedAt": "DateTime"
         }
       }
     }
   },
-  "sha256": "40e954479870afb2d7bbcdc4b2c350238ad5e9ee26f1eba47e7c5ad52efeb41d"
+  "sha256": "9f651ada236782cd4814b11a6f65f05b6d9d00a9ba28715ac5308586cf8f83b0"
 }

@@ -6,3 +6,5 @@ langgraph>=1.0,<2.0
 psycopg[binary]>=3.2,<4.0
 sqlglot>=26.0
 waapi>=0.1.2,<0.2
+typesafe-sdk>=0.7.5,<0.8
+ortools>=9.11,<10.0

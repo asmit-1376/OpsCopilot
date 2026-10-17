@@ -12,12 +12,14 @@ class WorkflowState(TypedDict, total=False):
     trainer_id: str | None
     student_id: str | None
     mobile_number: str | None
+    history: list[dict[str, str]]
 
     route: dict[str, Any]
     sql_plan: dict[str, Any]
     database_rows: list[dict[str, Any]]
     database_status: str
     retrieved_mobile: str | None
+    whatsapp_proposal: dict[str, Any]
     whatsapp_message: str | None
     whatsapp_result: dict[str, Any]
     whatsapp_status: str

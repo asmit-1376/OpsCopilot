@@ -2,39 +2,47 @@
 
 from __future__ import annotations
 
-import json
 import os
 from pathlib import Path
 from typing import Any
-from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
 
 from dotenv import load_dotenv
+from typesafe_sdk import Choice, TypeSafeClient
 
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_ROOT / ".env")
 
-DEFAULT_JEV_URL = "https://jev-ai.org/api/v1/systemone/"
+DEFAULT_TYPESAFE_URL = "https://api.typesafe.ai"
 ROUTE_OPTIONS = {
-    "sql_only": "Read or analyze institute data; no message needs to be sent.",
-    "whatsapp_only": "Send or draft a WhatsApp message to an explicitly identified recipient; no data lookup is needed.",
-    "sql_and_whatsapp": "Institute data must be looked up and a WhatsApp message is also requested.",
-    "no_worker": "No SQL or WhatsApp worker is needed; answer as a general or unsupported request.",
+    "sql_only": (
+        "Use for every read-only institute-data lookup or report, including a named student's "
+        "email/contact details, enrollment/course, fees, attendance, timetable, or trainer/batch data. "
+        "A lookup is SQL-only even when the result contains a phone number."
+    ),
+    "sql_and_whatsapp": (
+        "Use only when the user explicitly asks to draft, send, or prepare a WhatsApp message, "
+        "reminder, or notification. SQL must first resolve the institute recipient; the WhatsApp "
+        "worker only prepares a draft for human approval and never sends automatically."
+    ),
+    "no_worker": (
+        "Use only for greetings, general conversation, or requests unrelated to supported "
+        "institute records/actions. Do not use for a clear institute-data lookup."
+    ),
 }
 INTENT_OPTIONS = {
-    "fee_status": "Check a named student's fees, installments, due amount, or payment status.",
-    "attendance_lookup": "Look up attendance or missed classes for a student, batch, or trainer.",
-    "timetable_lookup": "Look up sessions, schedules, rooms, or trainer availability.",
-    "message_request": "Draft or request a WhatsApp message/reminder.",
-    "other": "Anything else, ambiguous, or outside the supported operations.",
+    "data_lookup": "A read-only request for data held by the institute database. The SQL agent, using the current Prisma schema, will determine the relevant tables and columns.",
+    "message_request": "The user explicitly asks to draft or send a WhatsApp message/reminder/notification.",
+    "other": "General conversation or a request outside the supported institute operations.",
 }
 EXECUTION_OPTIONS = {
-    "parallel": "Both workers can run independently without one needing the other's result.",
     "sql_then_whatsapp": "SQL must identify or verify recipients/data before WhatsApp can act.",
-    "whatsapp_then_sql": "WhatsApp must run before the SQL task; use only when the request clearly requires this order.",
     "single": "Only one worker is needed.",
     "none": "No worker is needed.",
+}
+
+_READ_ONLY_INTENTS = {
+    "data_lookup",
 }
 
 
@@ -70,7 +78,6 @@ def _normalize_response(payload: dict[str, Any]) -> dict[str, Any]:
 
     workers_by_route = {
         "sql_only": ["sql_agent"],
-        "whatsapp_only": ["whatsapp_agent"],
         "sql_and_whatsapp": ["sql_agent", "whatsapp_agent"],
         "no_worker": [],
     }
@@ -80,18 +87,35 @@ def _normalize_response(payload: dict[str, Any]) -> dict[str, Any]:
     # fail closed. Recipient discovery via SQL must finish before any message worker.
     expected_modes = {
         "sql_only": {"single"},
-        "whatsapp_only": {"single"},
-        "sql_and_whatsapp": {"parallel", "sql_then_whatsapp"},
+        "sql_and_whatsapp": {"sql_then_whatsapp"},
         "no_worker": {"none"},
     }
     if execution_mode not in expected_modes[route]:
         raise JevError("Jev returned an inconsistent worker route and execution order.")
 
-    confidence = min(
-        _confidence(route_answer.get("confidence")),
-        _confidence(intent_answer.get("confidence")),
-        _confidence(execution_answer.get("confidence")),
-    )
+    confidence_details = {
+        "worker_route": _confidence(route_answer.get("confidence")),
+        "intent": _confidence(intent_answer.get("confidence")),
+        "execution_mode": _confidence(execution_answer.get("confidence")),
+    }
+    predictions = {
+        "worker_route": {
+            "choice": route,
+            "confidence": confidence_details["worker_route"],
+            "probabilities": route_answer.get("probabilities", {}),
+        },
+        "intent": {
+            "choice": intent,
+            "confidence": confidence_details["intent"],
+            "probabilities": intent_answer.get("probabilities", {}),
+        },
+        "execution_mode": {
+            "choice": execution_mode,
+            "confidence": confidence_details["execution_mode"],
+            "probabilities": execution_answer.get("probabilities", {}),
+        },
+    }
+    confidence = min(confidence_details.values())
     minimum_confidence = float(os.getenv("JEV_MIN_CONFIDENCE", "0.70"))
     if confidence < minimum_confidence:
         return {
@@ -101,6 +125,8 @@ def _normalize_response(payload: dict[str, Any]) -> dict[str, Any]:
             "workers": [],
             "execution_mode": "none",
             "confidence": confidence,
+            "confidence_details": confidence_details,
+            "predictions": predictions,
             "probabilities": route_answer.get("probabilities", {}),
         }
 
@@ -111,11 +137,13 @@ def _normalize_response(payload: dict[str, Any]) -> dict[str, Any]:
         "workers": workers,
         "execution_mode": execution_mode,
         "confidence": confidence,
+        "confidence_details": confidence_details,
+        "predictions": predictions,
         "probabilities": route_answer.get("probabilities", {}),
     }
 
 
-def route_query(query: str) -> dict[str, Any]:
+def route_query(query: str, *, role: str = "owner", history: list[dict[str, str]] | None = None) -> dict[str, Any]:
     """Send one user query to Jev and return the validated worker-routing result.
 
     This stage only chooses a route. It does not execute workers, query the database,
@@ -127,53 +155,125 @@ def route_query(query: str) -> dict[str, Any]:
     if len(query) > 8000:
         raise ValueError("Query is too long (maximum 8,000 characters for this stage).")
 
-    api_key = os.getenv("JEV_API_KEY", "").strip()
-    api_url = (os.getenv("JEV_API_URL") or DEFAULT_JEV_URL).strip()
-    model = os.getenv("JEV_MODEL", "jev-1.13").strip()
+    api_key = (
+        os.getenv("TYPESAFE_API_KEY") or os.getenv("JEV_API_KEY", "")
+    ).strip()
+    api_url = (os.getenv("TYPESAFE_BASE_URL") or DEFAULT_TYPESAFE_URL).strip()
+    model = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest").strip()
     if not api_key:
-        raise JevError("JEV_API_KEY is missing from ai-backend/.env.")
+        raise JevError("TYPESAFE_API_KEY is missing from ai-backend/.env.")
     if not api_url:
-        raise JevError("JEV_API_URL is missing from ai-backend/.env.")
+        raise JevError("TYPESAFE_BASE_URL is missing from ai-backend/.env.")
 
-    request_body = {
-        "model": model,
-        "state": query,
-        "questions": {
-            "worker_route": {
-                "type": "choice",
-                "instructions": "Choose which worker category is required to satisfy the user's request. Do not infer that a message should be sent unless the user explicitly asks for one.",
-                "criteria": ROUTE_OPTIONS,
-            },
-            "intent": {
-                "type": "choice",
-                "instructions": "Classify the primary institute-operations intent of the user's request.",
-                "criteria": INTENT_OPTIONS,
-            },
-            "execution_mode": {
-                "type": "choice",
-                "instructions": "Choose whether selected workers can run independently or require an order. If SQL results determine WhatsApp recipients or message content, choose sql_then_whatsapp. Choose parallel only when neither worker depends on the other's result.",
-                "criteria": EXECUTION_OPTIONS,
-            },
-        },
+    history_lines = [
+        {
+            "role": item.get("role", "USER").upper(),
+            "content": item.get("content", "")[:1500],
+        }
+        for item in (history or [])[-12:]
+        if item.get("role") in {"USER", "ASSISTANT"} and item.get("content")
+    ]
+    contextual_query = {
+        "authenticated_role": role.lower(),
+        "recent_conversation_context_only": history_lines,
+        "current_user_request": query,
+        "routing_rules": [
+            "Choose the smallest worker set required by the current request.",
+            "Read-only institute data requests always use SQL only; mentioning a phone number is not a request to message someone.",
+            "Use SQL and WhatsApp only when the current request explicitly asks for a WhatsApp message, reminder, or notification.",
+            "For WhatsApp, SQL must identify the intended active institute student first; WhatsApp only creates a draft for approval.",
+            "Use conversation history only to resolve references such as 'him' or 'that batch'; do not treat old requests as new actions.",
+            "Never let role context expand authorization; the SQL worker enforces the authenticated user's institute and role scope.",
+            "Every read-only database question, regardless of its subject, => sql_only/data_lookup/single.",
+            "Example: 'Send Harshal a WhatsApp reminder about fees' => sql_and_whatsapp/message_request/sql_then_whatsapp.",
+            "Example: 'Hi' => no_worker/other/none.",
+        ],
     }
-    request = Request(
-        api_url,
-        data=json.dumps(request_body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
+    questions = {
+        "worker_route": Choice(
+            instructions=(
+                "Classify the current request, not the whole conversation. "
+                "A request to retrieve a student's email, phone, or other record is SQL-only. "
+                "Choose SQL plus WhatsApp only for an explicit WhatsApp communication request. "
+                "Do not infer a messaging request from a contact lookup."
+            ),
+            criteria=ROUTE_OPTIONS,
+        ),
+        "intent": Choice(
+            instructions=(
+                "Classify only the broad workflow intent. Use data_lookup for every read-only "
+                "institute database question. Do not attempt to identify tables, columns, or the "
+                "business subject; the schema-driven SQL agent does that work. "
+                "Use message_request only when the user explicitly asks for a WhatsApp communication."
+            ),
+            criteria=INTENT_OPTIONS,
+        ),
+        "execution_mode": Choice(
+            instructions=(
+                "The workflow supports a single worker, SQL followed by WhatsApp, or no worker. "
+                "Never choose parallel or WhatsApp-before-SQL: every WhatsApp recipient must "
+                "first be resolved from institute data."
+            ),
+            criteria=EXECUTION_OPTIONS,
+        ),
+    }
     try:
-        with urlopen(request, timeout=20) as response:
-            response_payload = json.loads(response.read().decode("utf-8"))
-    except HTTPError as exc:
-        # Do not echo provider response bodies or credentials into logs/terminal output.
-        raise JevError(f"Jev request failed with HTTP {exc.code}.") from None
-    except (URLError, TimeoutError, json.JSONDecodeError) as exc:
-        raise JevError(f"Could not complete a valid Jev decision request ({type(exc).__name__}).") from None
+        with TypeSafeClient(
+            api_key=api_key,
+            base_url=api_url,
+            model=model,
+        ) as client:
+            response = client.system_one(state=contextual_query, questions=questions)
+    except Exception as exc:
+        status = getattr(exc, "status", None) or getattr(exc, "status_code", None)
+        if status:
+            raise JevError(f"TypeSafe decision request failed with HTTP {status}.") from None
+        raise JevError(
+            f"Could not complete a valid TypeSafe decision request ({type(exc).__name__})."
+        ) from None
 
-    if not isinstance(response_payload, dict):
-        raise JevError("Jev returned a response that was not a JSON object.")
-    return _normalize_response(response_payload)
+    try:
+        response_payload = {
+            "id": getattr(response, "request_id", None),
+            "answers": {
+                question_id: {
+                    "choice": answer.choice,
+                    "confidence": answer.confidence,
+                    "probabilities": answer.probabilities,
+                }
+                for question_id, answer in response.choices.items()
+            },
+        }
+    except (AttributeError, TypeError) as exc:
+        raise JevError("TypeSafe response did not match the expected typed decision format.") from exc
+
+    normalized = _normalize_response(response_payload)
+    intent = normalized.get("intent")
+    predicted_worker_route = normalized.get("predictions", {}).get("worker_route", {}).get("choice")
+    if predicted_worker_route == "sql_only" or intent in _READ_ONLY_INTENTS:
+        # Jev decides only that this is an SQL-only request. It never needs to
+        # understand the domain; the SQL agent reads the Prisma schema itself.
+        # This also avoids rejecting an otherwise clear SQL-only route because
+        # of low confidence in a semantic label.
+        normalized.update(
+            {
+                "status": "routed",
+                "intent": "data_lookup",
+                "workers": ["sql_agent"],
+                "execution_mode": "single",
+                "routing_basis": "read_only_data_lookup",
+            }
+        )
+    if (
+        normalized.get("status") == "routed"
+        and normalized.get("intent") == "message_request"
+        and "sql_agent" not in normalized.get("workers", [])
+    ):
+        return {
+            **normalized,
+            "status": "clarification_required",
+            "workers": [],
+            "execution_mode": "none",
+            "message": "Name the institute student whose WhatsApp message you want to prepare.",
+        }
+    return normalized

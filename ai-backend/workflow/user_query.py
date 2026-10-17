@@ -22,7 +22,7 @@ async def run() -> int:
     if not query:
         parser.error("query cannot be empty")
 
-    async for chunk in astream_workflow(
+    async for event in astream_workflow(
         query,
         role=args.role,
         institute_id=args.institute_id,
@@ -30,7 +30,14 @@ async def run() -> int:
         student_id=args.student_id,
         mobile_number=args.mobile_number,
     ):
-        print(chunk, end="", flush=True)
+        event_type = event.get("event")
+        payload = event.get("data", {})
+        if event_type == "token":
+            print(payload.get("text", ""), end="", flush=True)
+        elif event_type == "status":
+            print(f"[{payload.get('worker', 'workflow')}] {payload.get('message', '')}")
+        elif event_type == "proposal":
+            print("WhatsApp draft awaiting approval: " + payload.get("message", ""))
     print()
     return 0
 
