@@ -6,6 +6,7 @@ import os
 import re
 from pathlib import Path
 from typing import Any
+from uuid import UUID
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field
@@ -147,3 +148,34 @@ def run_whatsapp_agent(
     except Exception as exc:
         return {"status": "failed", "stage": "draft", "reason": type(exc).__name__}
     return {**send_message(recipient, message), "message": message}
+
+
+def prepare_whatsapp_proposal(
+    query: str,
+    retrieved_data: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Draft a message for one database-identified student; never send here."""
+    recipients: set[str] = set()
+    for row in retrieved_data:
+        value = row.get("student_id")
+        if value is None:
+            continue
+        try:
+            recipients.add(str(UUID(str(value))))
+        except (ValueError, TypeError, AttributeError):
+            continue
+    if len(recipients) != 1:
+        return {
+            "status": "failed",
+            "stage": "recipient_validation",
+            "reason": "one_unambiguous_student_not_found",
+        }
+    try:
+        message = draft_message(query.strip(), retrieved_data)
+    except Exception as exc:
+        return {"status": "failed", "stage": "draft", "reason": type(exc).__name__}
+    return {
+        "status": "pending_approval",
+        "recipient_student_id": next(iter(recipients)),
+        "message": message,
+    }
