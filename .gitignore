@@ -19,3 +19,6 @@ ai-backend/venv/
 # Local tools
 .DS_Store
 Thumbs.db
+
+# External repositories used only for architecture research
+git-learn/
